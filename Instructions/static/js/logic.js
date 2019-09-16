@@ -5,7 +5,7 @@ var queryUrl = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_we
 d3.json(queryUrl, function(data) {
   // Once we get a response, send the data.features object to the createFeatures function
  createFeatures(data.features);
-  
+});
  function createFeatures(earthquakeData) {       
 
 
@@ -54,31 +54,16 @@ d3.json(queryUrl, function(data) {
 
 }
 function getColor(d) {
-
   return d > 5 ? '#F30' :
-
   d > 4  ? '#F60' :
-
   d > 3  ? '#F90' :
-
   d > 2  ? '#FC0' :
-
   d > 1   ? '#FF0' :
-
             '#9F3';
-
 }
-
-
-
 function getRadius(value){
-
   return value*15000
-
 }
-
-
-  
 
 function createMap(earthquakes) {
 
@@ -124,28 +109,38 @@ function createMap(earthquakes) {
     collapsed: false
   }).addTo(myMap);
 
+// Creating a control with a legend
+var legend = L.control({position: 'bottomright'});
+    legend.onAdd = function (myMap) {
+      	var div = L.DomUtil.create('div', 'info legend'),
+		grades = [0, 1, 2, 3, 4, 5],
+		labels = [];
 
+	// loop through our density intervals and generate a label with a colored square for each interval
+	for (var i = 0; i < grades.length; i++) {
+		div.innerHTML +=
+			'<i style="background:' + getColor(grades[i] + 1) + '"></i> ' +
+			grades[i] + (grades[i + 1] ? '&ndash;' + grades[i + 1] + '<br>' : '+');
+	}
+
+	return div;
+};
+
+legend.addTo(myMap);
 }
-  //create markers
- /* L.circle(earthquakes, {
-    color: "red",
-    fillColor: "red",
-    fillOpacity: 0.75,
-    radius: 10000
-  }).addTo(myMap);*/
+  // create Markers
   function createMarkers(earthquakes) {
   
     // Pull the "features" property off of response.data
     var features = earthquakes.metadata.features;
     console.log(features);
-    // Initialize an array to hold bike markers
+    // Initialize an array to hold earthquack markers
     var earthquakeMarkers = [];
   
     // Loop through the features array
     for (var index = 0; index < features.length; index++) {
       var feature = features[index];
 }
- // Create a layer group made from the bike markers array, pass it into the createMap function
+ // Create a layer group made from the earthquake markers array, pass it into the createMap function
  createMap(L.layerGroup(earthquakeMarkers));
 }
-})
