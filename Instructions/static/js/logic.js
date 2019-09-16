@@ -1,50 +1,84 @@
 // Store our API endpoint inside queryUrl
 var queryUrl = "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/all_week.geojson" ;
-  
+ 
 // Perform a GET request to the query URL
 d3.json(queryUrl, function(data) {
   // Once we get a response, send the data.features object to the createFeatures function
-  createFeatures(data.features);
+ createFeatures(data.features);
   
-  /* // Create a new marker cluster group
-   var markers = L.markerClusterGroup();
+ function createFeatures(earthquakeData) {       
 
-   // Loop through data
-   for (var i = 0; i < data.length; i++) {
- 
-     // Set the data location property to a variable
-     var location = data[i].location;
- 
-     // Check for location property
-     if (location) {
- 
-       // Add a new marker to the cluster group and bind a pop-up
-       markers.addLayer(L.marker([location.coordinates[1], location.coordinates[0]])
-         .bindPopup(data[i].descriptor));
-     }
-    }
-     // Add our marker cluster layer to the map
-  myMap.addLayer(markers);*/
-});
 
-function createFeatures(earthquakeData) {
-
-  // Define a function we want to run once for each feature in the features array
-  // Give each feature a popup describing the place and time of the earthquake
-  function onEachFeature(feature, layer) {
-    layer.bindPopup("<h3>" + feature.properties.place +
-      "</h3><hr><p>" + new Date(feature.properties.time) + "</p>"+"<h4>"+"Magnitude  " + feature.properties.mag+"</h4>");
-  }
 
   // Create a GeoJSON layer containing the features array on the earthquakeData object
+
   // Run the onEachFeature function once for each piece of data in the array
-  var earthquakes = L.geoJSON(earthquakeData, {
-    onEachFeature: onEachFeature
+
+  var earthquakes = L.geoJson(earthquakeData, {
+
+    onEachFeature: function (feature, layer){
+
+      layer.bindPopup("<h3>" + feature.properties.place + "<br> Magnitude: " + feature.properties.mag +
+
+      "</h3><hr><p>" + new Date(feature.properties.time) + "</p>");
+
+    },
+
+    pointToLayer: function (feature, latlng) {
+
+      return new L.circle(latlng,
+
+        {radius: getRadius(feature.properties.mag),
+
+          fillColor: getColor(feature.properties.mag),
+
+          fillOpacity: .7,
+
+          stroke: true,
+
+          color: "black",
+
+          weight: .5
+
+      })
+
+    }
+
   });
 
+
+
   // Sending our earthquakes layer to the createMap function
-  createMap(earthquakes);
+
+  createMap(earthquakes)
+
 }
+function getColor(d) {
+
+  return d > 5 ? '#F30' :
+
+  d > 4  ? '#F60' :
+
+  d > 3  ? '#F90' :
+
+  d > 2  ? '#FC0' :
+
+  d > 1   ? '#FF0' :
+
+            '#9F3';
+
+}
+
+
+
+function getRadius(value){
+
+  return value*15000
+
+}
+
+
+  
 
 function createMap(earthquakes) {
 
@@ -74,14 +108,14 @@ function createMap(earthquakes) {
     Earthquakes: earthquakes
   };
 
-  // Create our map, giving it the streetmap and earthquakes layers to display on load
-  var myMap = L.map("map", {
-    center: [
-      37.09, -95.71
-    ],
-    zoom: 5,
-    layers: [streetmap, earthquakes]
-  });
+ var myMap = L.map("map", {
+  center: [
+    37.09, -95.71
+  ],
+  zoom: 5,
+  layers: [streetmap, earthquakes]
+}); 
+  
 
   // Create a layer control
   // Pass in our baseMaps and overlayMaps
@@ -89,14 +123,17 @@ function createMap(earthquakes) {
   L.control.layers(baseMaps, overlayMaps, {
     collapsed: false
   }).addTo(myMap);
+
+
+}
   //create markers
  /* L.circle(earthquakes, {
     color: "red",
     fillColor: "red",
     fillOpacity: 0.75,
     radius: 10000
-  }).addTo(myMap);
-  /*function createMarkers(earthquakes) {
+  }).addTo(myMap);*/
+  function createMarkers(earthquakes) {
   
     // Pull the "features" property off of response.data
     var features = earthquakes.metadata.features;
@@ -111,12 +148,4 @@ function createMap(earthquakes) {
  // Create a layer group made from the bike markers array, pass it into the createMap function
  createMap(L.layerGroup(earthquakeMarkers));
 }
-    var earthquakeMarkers = [];
-var heat = L.heatLayer(earthquakeMarkers, {
-  radius: 20,
-  blur: 35
-}).addTo(myMap);
-// Create a red circle over Dallas
-*/
-  
-  }
+})
