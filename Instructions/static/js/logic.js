@@ -58,7 +58,7 @@ function getColor(d) {
   d > 4  ? '#F60' :
   d > 3  ? '#F90' :
   d > 2  ? '#FC0' :
-  d > 1   ? '#FF0' :
+  d > 1  ? '#FF0' :
             '#9F3';
 }
 function getRadius(value){
@@ -67,25 +67,32 @@ function getRadius(value){
 
 function createMap(earthquakes) {
 
-  // Define streetmap and darkmap layers
+  // Define streetmap, satellite and lightmap layers
   var streetmap = L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}", {
     attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
     maxZoom: 18,
     id: "mapbox.streets",
     accessToken: API_KEY
   });
-
-  var darkmap = L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}", {
+  var satellite = L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}", {
     attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
     maxZoom: 18,
-    id: "mapbox.dark",
+    id: "mapbox.satellite",
+    accessToken: API_KEY
+  });
+
+  var lightmap = L.tileLayer("https://api.tiles.mapbox.com/v4/{id}/{z}/{x}/{y}.png?access_token={accessToken}", {
+    attribution: "Map data &copy; <a href=\"https://www.openstreetmap.org/\">OpenStreetMap</a> contributors, <a href=\"https://creativecommons.org/licenses/by-sa/2.0/\">CC-BY-SA</a>, Imagery © <a href=\"https://www.mapbox.com/\">Mapbox</a>",
+    maxZoom: 18,
+    id: "mapbox.light",
     accessToken: API_KEY
   });
 
   // Define a baseMaps object to hold our base layers
   var baseMaps = {
-    "Street Map": streetmap,
-    "Dark Map": darkmap
+    "Street map": streetmap,
+    "Satellite": satellite,
+    "Light Map": lightmap
   };
 
   // Create overlay object to hold our overlay layer
@@ -98,7 +105,7 @@ function createMap(earthquakes) {
     37.09, -95.71
   ],
   zoom: 5,
-  layers: [streetmap, earthquakes]
+  layers: [streetmap,satellite, earthquakes]
 }); 
   
 
